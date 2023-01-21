@@ -1,0 +1,28 @@
+from keras.layers import Input, Conv3D, MaxPooling3D, Flatten, Dense
+from keras.models import Model
+from keras.optimizers import Adam
+import numpy as np
+
+# Load the data
+X_train = np.load('X_train.npy')
+y_train = np.load('y_train.npy')
+X_val = np.load('X_val.npy')
+y_val = np.load('y_val.npy')
+
+# Create the model
+input_layer = Input(shape=(16, 112, 112, 3))
+
+# Add the 3D convolutional layers
+conv_layer1 = Conv3D(32, kernel_size=(3, 3, 3), activation='relu', padding='same')(input_layer)
+pool_layer1 = MaxPooling3D(pool_size=(2, 2, 2))(conv_layer1)
+
+conv_layer2 = Conv3D(64, kernel_size=(3, 3, 3), activation='relu', padding='same')(pool_layer1)
+pool_layer2 = MaxPooling3D(pool_size=(2, 2, 2))(conv_layer2)
+
+conv_layer3 = Conv3D(128, kernel_size=(3, 3, 3), activation='relu', padding='same')(pool_layer2)
+pool_layer3 = MaxPooling3D(pool_size=(2, 2, 2))(conv_layer3)
+
+# Add the flatten and dense layers
+flatten_layer = Flatten()(pool_layer3)
+dense_layer = Dense(512, activation='relu')(flatten_layer)
+output_layer = Dense(len(np.unique(y_train)),
